@@ -150,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             padding: EdgeInsets.zero,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
             itemBuilder: (BuildContext context, int index) {
-              return ProductWidget(product: products[index]);
+              return ProductWidget(product: products[index], index: index);
             },
           ),
         ),
