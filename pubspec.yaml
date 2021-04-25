@@ -37,6 +37,10 @@ dependencies:
   flutter_swiper: ^1.1.6
   intl: ^0.16.1
   blurred: ^1.1.0
+  flutter_appavailability: ^0.0.21
+  url_launcher:
+  fluttertoast: ^7.1.8
+  maps_launcher:
 
 dev_dependencies:
   flutter_test:

@@ -1,9 +1,13 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_appavailability/flutter_appavailability.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:test_app/custom_widgets/app_widgets.dart';
 import 'package:test_app/helpers/extensions.dart';
 import 'package:test_app/helpers/size_config.dart';
@@ -12,6 +16,7 @@ import 'package:test_app/resources/text_styles.dart';
 import 'package:test_app/state_management/providers/state_providers.dart';
 import 'package:test_app/state_management/service_providers/events_service.dart';
 import 'package:test_app/state_management/states/events_state.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final int eventID;
@@ -36,22 +41,27 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> with TickerProv
   void initState() {
     // TODO: implement initState
     super.initState();
-    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 200));
     _colorTween = ColorTween(begin: Colors.blueGrey, end: Colors.red).animate(CurvedAnimation(
       parent: _animationController,
       curve: Interval(
         0.0,
-        0.9,
+        1.0,
         curve: Curves.easeInCubic,
       ),
-    ));
+    ))
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _animationController.reverse();
+        }
+      });
 
     sizeAnimation = Tween(begin: 1.0, end: 1.3).animate(CurvedAnimation(
         parent: _animationController,
         curve: Interval(
           0.0,
-          0.9,
-          curve: Curves.elasticInOut,
+          1.0,
+          curve: Curves.easeInCubic,
         )));
 
     loadData(initialLoad: true);
@@ -63,7 +73,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> with TickerProv
         id: widget.eventID,
         completion: (result, error) {
           if (result == false) {
-            // AppWidgets.showAlertDialogue(context: context, title: 'Home Feed', message: error, defaultButtonTitle: 'OK');
+            AppWidgets.showToast("Oops. Cannot load data. Please try again later");
           }
         });
   }
@@ -198,6 +208,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> with TickerProv
                               child: BottomButton(
                                 text: "£${eventDetails.state.selectedEventDetail.price} - I’M IN!",
                                 buttonColor: Color(0xff11D0A2),
+                                textStyle: AppTextStyles.whiteFont600.copyWith(fontSize: 16),
                               )),
                         ],
                       ),
@@ -229,15 +240,25 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> with TickerProv
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  AppWidgets.svgIcon(icon: 'assets/icons/share.svg', size: 16),
-                  SizedBox(width: SizeConfig.safeBlockHorizontal * 8),
+                  Container(
+                      margin: EdgeInsets.only(right: 5),
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(color: Color(0xff9DA6B1), borderRadius: BorderRadius.all(Radius.circular(50)), border: Border.all(color: Colors.transparent)),
+                      child: Row(
+                        children: [
+                          AppWidgets.svgIcon(icon: 'assets/icons/ic_follow.svg', size: 18),
+                          SizedBox(width: SizeConfig.safeBlockHorizontal),
+                          Text('Share Event', style: AppTextStyles.whiteFontNormal.copyWith(fontSize: 12)),
+                        ],
+                      )),
+                  // SizedBox(width: SizeConfig.safeBlockHorizontal * 8),
                   AnimatedBuilder(
                       animation: _animationController,
                       builder: (buildContext, child) {
                         return Transform.scale(
                           scale: sizeAnimation.value,
                           child: IconButton(
-                            icon: AppWidgets.svgIcon(icon: 'assets/icons/heart.svg', size: 16, color: _colorTween.value),
+                            icon: AppWidgets.svgIcon(icon: 'assets/icons/heart.svg', size: 18, color: _colorTween.value),
                             onPressed: () {
                               if (_animationController.isCompleted) {
                                 _animationController.reverse();
@@ -267,7 +288,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> with TickerProv
           Row(children: [
             AppWidgets.svgIcon(icon: 'assets/icons/ic_ticket_black.svg', size: 16),
             SizedBox(width: SizeConfig.safeBlockHorizontal * 2),
-            Text('${eventDetails.ticketsSold}/${eventDetails.maxTickets} attending', style: AppTextStyles.blackFontNormal.copyWith(fontSize: 14)),
+            Text('${eventDetails.ticketsSold}/${eventDetails.maxTickets} attending',
+                style: AppTextStyles.blackFontNormal.copyWith(fontSize: 14, decoration: TextDecoration.underline, color: Color(0xff7555CF))),
           ]),
         ],
       ),
@@ -382,7 +404,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> with TickerProv
               FlatButton(
                   padding: EdgeInsets.zero,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  onPressed: () {},
+                  onPressed: () {
+                    MapsLauncher.launchQuery(eventDetails.location);
+                  },
                   child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                       decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(30)), border: Border.all(color: Color(0xff6658D3))),
@@ -405,7 +429,19 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> with TickerProv
           SizedBox(height: SizeConfig.safeBlockVertical * 2),
           Text('CONTACT :', style: AppTextStyles.blackFontNormal.copyWith(fontSize: 15)),
           SizedBox(height: SizeConfig.safeBlockVertical * 2),
-          Text('Send us an email at contact@techalchemy.co or call us at +1 991-681-0200', style: AppTextStyles.blackFontNormal.copyWith(fontSize: 15)),
+          RichText(
+              text: new TextSpan(children: [
+            new TextSpan(text: "Send us an email at ", style: AppTextStyles.blackFontNormal.copyWith(fontSize: 15)),
+            new TextSpan(
+                text: "contact@techalchemy.co",
+                style: AppTextStyles.blackFontNormal.copyWith(fontSize: 15, color: Color(0xff6658D3)),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    // openEmailApp(context);
+                    _sendMail();
+                  }),
+            new TextSpan(text: "or call us at +1 991-681-0200", style: AppTextStyles.blackFontNormal.copyWith(fontSize: 15)),
+          ])),
           SizedBox(height: SizeConfig.safeBlockVertical * 2),
           Divider(color: Colors.black12, thickness: 1)
         ],
@@ -583,5 +619,28 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> with TickerProv
         SizedBox(height: SizeConfig.safeBlockVertical * 15),
       ],
     );
+  }
+
+  void openEmailApp(BuildContext context) {
+    try {
+      AppAvailability.launchApp(Platform.isIOS ? "googlegmail" : "com.google.android.gm").then((_) {}).catchError((err) {
+        AppWidgets.showToast("Gmail not found");
+        print(err);
+      });
+    } catch (e) {
+      AppWidgets.showToast("App Email not found");
+    }
+  }
+
+  _sendMail() async {
+    // Android and iOS
+
+    const uri = 'mailto:contact@techalchemy.co?subject=Greetings from MLP11&body=Some static text to be placed';
+    if (await canLaunch(uri)) {
+      await launch(uri);
+    } else {
+      AppWidgets.showToast("Cannot open email app");
+      // throw 'Could not launch $uri';;
+    }
   }
 }

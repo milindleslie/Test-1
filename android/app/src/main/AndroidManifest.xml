@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="test_app"
+        android:label="TechAlchemy-Milind"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

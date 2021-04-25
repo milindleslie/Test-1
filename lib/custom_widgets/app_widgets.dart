@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:test_app/resources/colors.dart';
 import 'package:test_app/state_management/states/events_state.dart';
@@ -33,6 +34,19 @@ class AppWidgets {
               errorWidget: (context, url, error) => Image.asset('assets/images/no_image.jpg', fit: BoxFit.cover, width: width, height: height),
             )
           : placeHolderImage ?? Icon(Icons.image, size: height ?? 50.0, color: Colors.blue),
+    );
+  }
+
+  static showToast(String message) {
+    Fluttertoast.cancel();
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 2,
+      backgroundColor: Colors.grey,
+      textColor: Colors.white,
+      fontSize: 12.0,
     );
   }
 }

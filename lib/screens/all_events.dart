@@ -254,53 +254,59 @@ class _AllEventsScreenState extends State<AllEventsScreen> with TickerProviderSt
         loop: false,
         // control: new SwiperControl(),
         itemBuilder: (BuildContext context, int index) {
-          return Container(
-              margin: EdgeInsets.only(
-                right: SizeConfig.safeBlockHorizontal * 3,
-                bottom: SizeConfig.safeBlockVertical * 5,
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: SizeConfig.safeBlockHorizontal * 5,
-                vertical: SizeConfig.safeBlockVertical * 2,
-              ),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  color: Colors.grey, image: DecorationImage(image: NetworkImage(events[index].mainImage), fit: BoxFit.cover), borderRadius: BorderRadius.all(Radius.circular(20))),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Row(children: [
-                    AppWidgets.svgIcon(icon: 'assets/icons/ic_event_time.svg', size: 15),
-                    SizedBox(width: SizeConfig.safeBlockHorizontal * 3),
-                    Text('${formattedDateAndTime(events[index].dateTime)}', style: AppTextStyles.whiteFontNormal.copyWith(fontSize: 13)),
-                  ]),
-                  Text(events[index].name, style: AppTextStyles.whiteFont700.copyWith(fontSize: 17)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.all(Radius.circular(30)), border: Border.all(color: Colors.white)),
-                          child: Row(
-                            children: [
-                              AppWidgets.svgIcon(icon: 'assets/icons/ic_ticket.svg', size: 13),
-                              SizedBox(width: SizeConfig.safeBlockHorizontal),
-                              Text('${events[index].ticketsSold}/${events[index].maxTickets}', style: AppTextStyles.whiteFont700.copyWith(fontSize: 12)),
-                            ],
-                          )),
-                      Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.all(Radius.circular(30)), border: Border.all(color: Colors.white)),
-                          child: Text('+ ${events[index].friendsAttending} friends', style: AppTextStyles.whiteFont700.copyWith(fontSize: 12))),
-                      Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(color: Color(0xff02D9E7), borderRadius: BorderRadius.all(Radius.circular(30)), border: Border.all(color: Colors.white)),
-                          child: Text('£${events[index].price}', style: AppTextStyles.whiteFont700.copyWith(fontSize: 12))),
-                    ],
-                  )
-                ],
-              ));
+          return GestureDetector(
+            onTap: () => Navigator.of(context).push(CupertinoPageRoute(builder: (context) => EventDetailsScreen(eventID: events[index].id))),
+            child: Container(
+                margin: EdgeInsets.only(
+                  right: SizeConfig.safeBlockHorizontal * 3,
+                  bottom: SizeConfig.safeBlockVertical * 5,
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: SizeConfig.safeBlockHorizontal * 5,
+                  vertical: SizeConfig.safeBlockVertical * 2,
+                ),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Colors.grey,
+                    image: DecorationImage(image: NetworkImage(events[index].mainImage), fit: BoxFit.cover),
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Row(children: [
+                      AppWidgets.svgIcon(icon: 'assets/icons/ic_event_time.svg', size: 15),
+                      SizedBox(width: SizeConfig.safeBlockHorizontal * 3),
+                      Text('${formattedDateAndTime(events[index].dateTime)}', style: AppTextStyles.whiteFontNormal.copyWith(fontSize: 13)),
+                    ]),
+                    Text(events[index].name, style: AppTextStyles.whiteFont700.copyWith(fontSize: 17)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.all(Radius.circular(30)), border: Border.all(color: Colors.white)),
+                            child: Row(
+                              children: [
+                                AppWidgets.svgIcon(icon: 'assets/icons/ic_ticket.svg', size: 13),
+                                SizedBox(width: SizeConfig.safeBlockHorizontal),
+                                Text('${events[index].ticketsSold}/${events[index].maxTickets}', style: AppTextStyles.whiteFont700.copyWith(fontSize: 12)),
+                              ],
+                            )),
+                        Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.all(Radius.circular(30)), border: Border.all(color: Colors.white)),
+                            child: Text('+ ${events[index].friendsAttending} friends',
+                                style: AppTextStyles.whiteFont700.copyWith(fontSize: 12, decoration: TextDecoration.underline))),
+                        Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(color: Color(0xff02D9E7), borderRadius: BorderRadius.all(Radius.circular(30)), border: Border.all(color: Colors.white)),
+                            child: Text('£${events[index].price}', style: AppTextStyles.whiteFont700.copyWith(fontSize: 12))),
+                      ],
+                    )
+                  ],
+                )),
+          );
         },
       ),
     );
@@ -405,7 +411,7 @@ class _AllEventsScreenState extends State<AllEventsScreen> with TickerProviderSt
                                   AppWidgets.svgIcon(icon: 'assets/icons/ic_ticket_black.svg', size: 16),
                                   SizedBox(width: SizeConfig.safeBlockHorizontal * 2),
                                   Text('${events[index - 1].ticketsSold}/${events[index - 1].maxTickets} attending total',
-                                      style: AppTextStyles.blackFontNormal.copyWith(fontSize: 14)),
+                                      style: AppTextStyles.blackFontNormal.copyWith(fontSize: 14, color: Color(0xff7555CF), decoration: TextDecoration.underline)),
                                 ]),
                                 SizedBox(height: SizeConfig.safeBlockVertical * 2),
                                 Row(
