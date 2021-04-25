@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:test_app/helpers/shared_preferences.dart';
 import 'package:test_app/network/endpoints.dart';
 import 'package:test_app/network/exceptions.dart';
 import 'package:test_app/network/interceptor.dart';
@@ -30,7 +29,7 @@ class NetworkAdapter {
     dio.interceptors.add(CustomLogInterceptor());
 
     if (endPoint.shouldAddToken == true) {
-      options.headers = {'Authorization': 'Bearer ${await SharedPreferenceHelper.shared.getToken()}'};
+      options.headers = {'Authorization': 'Bearer 786785e9-1b74-430a-80d9-aae49678954f'};
     }
 
     options.headers.addAll({'Content-Type': 'application/json'});

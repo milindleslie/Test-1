@@ -1,9 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:loading_indicator/loading_indicator.dart';
-import 'package:test_app/state_management/states/home_feed_state.dart';
+import 'package:test_app/resources/colors.dart';
+import 'package:test_app/state_management/states/events_state.dart';
 
 class AppWidgets {
+  static Widget svgIcon({@required String icon, double size = 24, Color color}) {
+    return SvgPicture.asset(icon, height: size, width: size, color: color, fit: BoxFit.contain);
+  }
+
   static Widget cachedNetworkImage({String url, double width, double height, BorderRadius borderRadius, Widget placeHolderImage, bool shadow = false}) {
     return Material(
       // elevation: 2,
@@ -43,7 +49,8 @@ class AppFetchingLoader extends StatelessWidget {
         ? Container(
             color: Colors.black12,
             alignment: Alignment.center,
-            child: SizedBox(width: deviceInfo.size.width * 0.2, child: LoadingIndicator(indicatorType: Indicator.ballRotateChase, color: Colors.orange)),
+            child:
+                SizedBox(width: deviceInfo.size.width * 0.2, child: LoadingIndicator(indicatorType: Indicator.ballScaleRippleMultiple, color: AppColors.appBlueColor), height: 20),
           )
         : Container();
   }
@@ -62,8 +69,50 @@ class AppBusyLoader extends StatelessWidget {
         ? Container(
             color: Colors.black12,
             alignment: Alignment.center,
-            child: SizedBox(width: deviceInfo.size.width * 0.2, child: LoadingIndicator(indicatorType: Indicator.ballRotateChase, color: Colors.orange)),
+            child:
+                SizedBox(width: deviceInfo.size.width * 0.2, child: LoadingIndicator(indicatorType: Indicator.ballScaleRippleMultiple, color: AppColors.appBlueColor), height: 20),
           )
         : Container();
+  }
+}
+
+class BottomButton extends StatelessWidget {
+  String text;
+  Function onPressed;
+  TextStyle textStyle;
+  Color buttonColor;
+  double topMargin;
+  double bottomMargin;
+  bool disabled;
+
+  BottomButton({
+    this.text = "",
+    this.onPressed,
+    this.disabled = false,
+    this.textStyle,
+    this.buttonColor,
+    this.topMargin,
+    this.bottomMargin,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var deviceInfo = MediaQuery.of(context);
+
+    return Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black12)]),
+      child: FlatButton(
+        onPressed: disabled ? null : onPressed,
+        child: Container(
+          margin: EdgeInsets.only(top: topMargin ?? 15.0, bottom: bottomMargin ?? 15.0),
+          alignment: Alignment.center,
+          child: Text(text, style: textStyle),
+          width: deviceInfo.size.width - (deviceInfo.size.width / 9),
+          height: 50,
+          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(100)), color: disabled ? Colors.grey : buttonColor ?? Color(0xff199fdd)),
+        ),
+      ),
+    );
   }
 }
